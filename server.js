@@ -171,5 +171,9 @@ app.post("/api/users/:id/increment", (req, res) => {
   );
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server jalan di http://localhost:${PORT}`));
+if (!process.env.VERCEL) {
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => {
+    console.log(`Local dev: http://localhost:${port}`);
+  });
+}
