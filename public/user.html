@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+  <head>
+    <title>User</title>
+    <style>
+      body {
+        font-family: "Poppins", Arial, sans-serif;
+        background: #6a0d0d; /* maroon */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      .user-box {
+        background: #fcecdc; /* cream */
+        padding: 30px 25px;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+        text-align: center;
+        width: 350px;
+      }
+
+      .user-box h2 {
+        margin-bottom: 20px;
+        color: #6a0d0d;
+        font-weight: bold;
+      }
+
+      .user-box p {
+        font-size: 15px;
+        margin: 10px 0;
+        color: #333;
+      }
+
+      #greet {
+        font-weight: bold;
+        font-size: 16px;
+        color: #6a0d0d;
+        text-transform: uppercase;
+      }
+
+      #free {
+        font-weight: bold;
+        color: #d47f4d; /* coffee brown */
+      }
+
+      .user-box button {
+        width: 100%;
+        padding: 12px;
+        margin-top: 15px;
+        background: #6a0d0d; /* maroon */
+        border: none;
+        border-radius: 8px;
+        color: #fcecdc; /* cream */
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .user-box button:hover {
+        background: #8b1e1e;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="user-box">
+      <h2>🎟️ Vouchermu Lur!</h2>
+      <p id="greet"></p>
+      <p id="total"></p>
+      <p id="free"></p>
+
+      <form action="/logout" method="POST">
+        <button type="submit">Logout</button>
+      </form>
+    </div>
+
+    <script src="/js/user.js"></script>
+  </body>
+</html>

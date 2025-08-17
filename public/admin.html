@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin</title>
+    <style>
+      :root {
+        --bg: #f6f7fb;
+        --card: #ffffff;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --primary: #2563eb;
+        --primary-hover: #1d4ed8;
+        --border: #e5e7eb;
+        --row: #f9fafb;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0b1220;
+          --card: #111827;
+          --text: #e5e7eb;
+          --muted: #9ca3af;
+          --primary: #3b82f6;
+          --primary-hover: #60a5fa;
+          --border: #1f2937;
+          --row: #0f172a;
+          --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Ubuntu,
+          Cantarell,
+          "Helvetica Neue",
+          Arial,
+          "Noto Sans",
+          "Apple Color Emoji",
+          "Segoe UI Emoji";
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      .wrap {
+        max-width: 980px;
+        margin: 40px auto;
+        padding: 0 16px;
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--border);
+      }
+      .title {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+      }
+      .title h2 {
+        margin: 0;
+        font-size: 22px;
+        letter-spacing: 0.2px;
+      }
+      .subtitle {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .input {
+        height: 40px;
+        padding: 0 12px;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text);
+        border-radius: 10px;
+        outline: none;
+        width: 220px;
+      }
+      .btn {
+        height: 40px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 10px;
+        background: var(--primary);
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          transform 0.04s ease,
+          background 0.2s ease;
+      }
+      .btn:hover {
+        background: var(--primary-hover);
+      }
+      .btn:active {
+        transform: translateY(1px);
+      }
+
+      .table-wrap {
+        width: 100%;
+        overflow: auto;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 640px;
+      }
+      thead th {
+        position: sticky;
+        top: 0;
+        background: var(--card);
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+        font-size: 13px;
+        padding: 14px 16px;
+        color: var(--muted);
+        letter-spacing: 0.3px;
+      }
+      tbody td {
+        border-bottom: 1px solid var(--border);
+        padding: 14px 16px;
+        font-size: 14px;
+      }
+      tbody tr:nth-child(odd) {
+        background: var(--row);
+      }
+
+      .footer {
+        display: flex;
+        justify-content: center;
+        padding: 18px;
+        border-top: 1px solid var(--border);
+      }
+      .logout {
+        background: transparent;
+        color: var(--primary);
+        border: 1px solid var(--primary);
+      }
+      .logout:hover {
+        background: var(--primary);
+        color: #fff;
+      }
+      .badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <div class="header">
+          <div class="title">
+            <h2>Admin Lur!</h2>
+          </div>
+          <div class="actions">
+            <input
+              id="filter"
+              class="input"
+              placeholder="Cari username…"
+              aria-label="Cari username"
+            />
+            <form action="/logout" method="POST">
+              <button type="submit" class="btn logout">Logout</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Total</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+
+        <div class="footer">
+          <small class="subtitle">© CoffeeOnMonday • Panel Admin</small>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/admin.js" defer></script>
+  </body>
+</html>

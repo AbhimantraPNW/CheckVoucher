@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Register</title>
+    <style>
+      body {
+        font-family: "Poppins", Arial, sans-serif;
+        background: #6a0d0d; /* maroon */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      .register-box {
+        background: #fcecdc; /* cream/beige */
+        padding: 30px 25px;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+        text-align: center;
+        width: 320px;
+      }
+
+      .register-box h2 {
+        margin-bottom: 20px;
+        color: #6a0d0d; /* maroon */
+        font-weight: bold;
+      }
+
+      .register-box input {
+        width: 90%;
+        padding: 12px;
+        margin: 10px 0;
+        border: 2px solid #6a0d0d;
+        border-radius: 8px;
+        outline: none;
+        transition: 0.2s;
+        background: #fffdf8;
+      }
+
+      .register-box input:focus {
+        border-color: #d47f4d; /* coffee brown */
+        box-shadow: 0 0 5px #d47f4d;
+      }
+
+      .register-box button {
+        width: 100%;
+        padding: 12px;
+        margin-top: 15px;
+        background: #6a0d0d; /* maroon */
+        border: none;
+        border-radius: 8px;
+        color: #fcecdc; /* cream */
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .register-box button:hover {
+        background: #8b1e1e; /* darker maroon */
+      }
+
+      .register-box p {
+        margin-top: 15px;
+        font-size: 14px;
+        color: #6a0d0d;
+      }
+
+      .register-box a {
+        color: #d47f4d; /* coffee brown */
+        text-decoration: none;
+        font-weight: bold;
+      }
+
+      .register-box a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="register-box">
+      <h2>Daftar Sek, Lur!</h2>
+      <form action="/register" method="POST">
+        <input type="text" name="username" placeholder="Username" required />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          required
+        />
+        <button type="submit">Gas Buat Akun</button>
+      </form>
+      <p>Sudah punya akun? <a href="/login.html">Login di sini</a></p>
+    </div>
+  </body>
+</html>
