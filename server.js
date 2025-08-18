@@ -60,7 +60,6 @@ app.use(
     keys: [process.env.SESSION_SECRET || ""],
     maxAge: 1000 * 60 * 60 * 8, // 8 jam
     sameSite: "lax",
-    // secure: process.env.NODE_ENV === "production",
   }),
 );
 
@@ -127,7 +126,6 @@ app.post("/login", async (req, res) => {
 
   const role = row.username === "adminbos" ? "admin" : "user";
   req.session.user = { id: row.id, username: row.username, role };
-  console.log("Session after login:", req.session);
 
   res.redirect(role === "admin" ? "/admin.html" : "/user.html");
 });
