@@ -5,6 +5,7 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const cookieSession = require("cookie-session");
 const session = require("express-session");
+const cors = require("cors");
 const { db, init } = require("./db");
 const app = express();
 app.set("trust proxy", 1); // Trust first proxy
@@ -50,6 +51,13 @@ app.use(async (req, res, next) => {
 if (process.env.VERCEL && !process.env.SESSION_SECRET) {
   throw new Error("Missing env SESSION_SECRET");
 }
+
+app.use(
+  cors({
+    origin: "https://check-voucher.vercel.app/", // Frontend domain
+    credentials: true, // Enable cookies to be sent
+  }),
+);
 
 app.use(helmet());
 app.use(express.urlencoded({ extended: true }));
