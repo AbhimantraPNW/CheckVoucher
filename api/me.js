@@ -1,10 +1,11 @@
-const { db } = require("../db"); // Import your database connection
-const requireLogin = require("../middleware/requireLogin"); // Import the requireLogin middleware
+const express = require("express");
+const { db } = require("../db");
+const requireLogin = require("../middleware/requireLogin");
 
-module.exports = async (req, res) => {
-  // Apply the requireLogin middleware before processing the request
-  await requireLogin;
+const router = express.Router(); // Create an Express Router
 
+// Apply the requireLogin middleware directly to the route
+router.get("/me", requireLogin, async (req, res) => {
   const { id } = req.user || {}; // Access the session data (JWT decoded)
 
   if (!id) {
@@ -12,7 +13,6 @@ module.exports = async (req, res) => {
   }
 
   try {
-    // Query the database to fetch user data
     const r = await db.execute({
       sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
       args: [id],
@@ -27,4 +27,6 @@ module.exports = async (req, res) => {
     console.error("Error querying database:", error);
     res.status(500).json({ error: "Internal server error" });
   }
-};
+});
+
+module.exports = router; // Export the router

@@ -10,8 +10,10 @@ const cors = require("cors");
 const { db, init } = require("./db");
 const app = express();
 const cookieParser = require("cookie-parser");
+const apiRoutes = require("./api/me");
 app.use(cookieParser());
 app.set("trust proxy", 1); // Trust first proxy
+app.use("/api", apiRoutes);
 
 let readyPromise = null;
 async function ensureReady() {
