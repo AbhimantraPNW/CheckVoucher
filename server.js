@@ -131,24 +131,24 @@ app.post("/api/users/:id/increment", requireLogin, async (req, res) => {
   res.json(r.rows[0]);
 });
 
-// init + seed admin
-(async () => {
-  await init();
-  const ADMIN_USER = process.env.ADMIN_USER || "adminbos";
-  const ADMIN_PASS = process.env.ADMIN_PASS || "admin123";
-  const exist = await db.execute({
-    sql: "SELECT 1 FROM users WHERE username = ?",
-    args: [ADMIN_USER],
-  });
-  if (!exist.rows[0]) {
-    const hash = await bcrypt.hash(ADMIN_PASS, 12);
-    await db.execute({
-      sql: "INSERT INTO users (username, password, total_buy, created_at) VALUES (?, ?, 0, datetime('now','localtime'))",
-      args: [ADMIN_USER, hash],
-    });
-    console.log("Seed admin created:", ADMIN_USER);
-  }
-})();
+// // init + seed admin
+// (async () => {
+//   await init();
+//   const ADMIN_USER = process.env.ADMIN_USER || "adminbos";
+//   const ADMIN_PASS = process.env.ADMIN_PASS || "admin123";
+//   const exist = await db.execute({
+//     sql: "SELECT 1 FROM users WHERE username = ?",
+//     args: [ADMIN_USER],
+//   });
+//   if (!exist.rows[0]) {
+//     const hash = await bcrypt.hash(ADMIN_PASS, 12);
+//     await db.execute({
+//       sql: "INSERT INTO users (username, password, total_buy, created_at) VALUES (?, ?, 0, datetime('now','localtime'))",
+//       args: [ADMIN_USER, hash],
+//     });
+//     console.log("Seed admin created:", ADMIN_USER);
+//   }
+// })();
 
 // local dev only
 if (!process.env.VERCEL) {
