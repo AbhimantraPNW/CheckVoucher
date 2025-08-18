@@ -1,30 +1,30 @@
 const { db } = require("../db"); // Import your database connection
 const requireLogin = require("../middleware/requireLogin"); // Import the requireLogin middleware
 
-module.exports = [
-  requireLogin, // Apply the requireLogin middleware before the route handler
-  async (req, res) => {
-    const { id } = req.user || {}; // Access the session data (JWT decoded)
+module.exports = async (req, res, next) => {
+  // Apply the requireLogin middleware before processing the request
+  await requireLogin(req, res, next);
 
-    if (!id) {
-      return res.status(401).json({ error: "Not authenticated" });
+  const { id } = req.user || {}; // Access the session data (JWT decoded)
+
+  if (!id) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  try {
+    // Query the database to fetch user data
+    const r = await db.execute({
+      sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
+      args: [id],
+    });
+
+    if (!r.rows[0]) {
+      return res.status(404).json({ error: "User not found" });
     }
 
-    try {
-      // Query database to fetch user data
-      const r = await db.execute({
-        sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
-        args: [id],
-      });
-
-      if (!r.rows[0]) {
-        return res.status(404).json({ error: "User not found" });
-      }
-
-      res.json(r.rows[0]); // Send user data as JSON
-    } catch (error) {
-      console.error("Error querying database:", error);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  },
-];
+    res.json(r.rows[0]); // Send user data as JSON
+  } catch (error) {
+    console.error("Error querying database:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
