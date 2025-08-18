@@ -1,5 +1,4 @@
-// server.js
-require("dotenv").config(); // baca .env saat lokal
+require("dotenv").config();
 
 const express = require("express");
 const path = require("path");
@@ -8,6 +7,7 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const cookieSession = require("cookie-session");
 const { db, init } = require("./db");
+const app = express();
 
 let readyPromise = null;
 async function ensureReady() {
@@ -55,7 +55,6 @@ process.on("uncaughtException", (e) => console.error("uncaughtException:", e));
 if (process.env.VERCEL && !process.env.SESSION_SECRET) {
   throw new Error("Missing env SESSION_SECRET");
 }
-const app = express();
 
 app.use(helmet());
 app.use(express.urlencoded({ extended: true }));
