@@ -1,25 +1,19 @@
-const { db } = require("../db"); // Import your database connection
-module.exports = async (req, res) => {
-  const { id } = req.session?.user || {}; // Access the session data
+async function loadMe() {
+  const res = await fetch("/api/me", { credentials: "include" });
+  // if (!res.ok) {
+  //   // belum login → balik ke login
+  //   location.href = "/login.html";
+  //   return;
+  // }
+  const me = await res.json();
+  const target = 9;
+  const remaining = target - me.total_buy;
 
-  if (!id) {
-    return res.status(401).json({ error: "Not authenticated" });
-  }
-
-  try {
-    // Query database to fetch user data
-    const r = await db.execute({
-      sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
-      args: [id],
-    });
-
-    if (!r.rows[0]) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    res.json(r.rows[0]); // Send user data as JSON
-  } catch (error) {
-    console.error("Error querying database:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-};
+  const sisa = remaining > 0 ? remaining : 0;
+  document.getElementById("greet").innerText = `Halo, ${me.username}`;
+  document.getElementById("total").innerText =
+    `Pembelianmu ke - ${me.total_buy}`;
+  document.getElementById("free").innerText =
+    `Beli ${sisa} lagi untuk dapet free 1 kopi!`;
+}
+loadMe();
