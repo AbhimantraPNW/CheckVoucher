@@ -46,11 +46,6 @@ app.use(async (req, res, next) => {
   }
 });
 
-process.on("unhandledRejection", (e) =>
-  console.error("unhandledRejection:", e),
-);
-process.on("uncaughtException", (e) => console.error("uncaughtException:", e));
-
 if (process.env.VERCEL && !process.env.SESSION_SECRET) {
   throw new Error("Missing env SESSION_SECRET");
 }
@@ -65,7 +60,7 @@ app.use(
     keys: [process.env.SESSION_SECRET || ""],
     maxAge: 1000 * 60 * 60 * 8, // 8 jam
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    // secure: process.env.NODE_ENV === "production",
   }),
 );
 
@@ -132,6 +127,7 @@ app.post("/login", async (req, res) => {
 
   const role = row.username === "adminbos" ? "admin" : "user";
   req.session.user = { id: row.id, username: row.username, role };
+  console.log("Session after login:", req.session);
 
   res.redirect(role === "admin" ? "/admin.html" : "/user.html");
 });
@@ -199,14 +195,4 @@ if (!process.env.VERCEL) {
   const port = process.env.PORT || 3000;
   app.listen(port, () => console.log(`Local: http://localhost:${port}`));
 }
-
-app.get("/healthz", (req, res) => {
-  res.json({
-    ok: true,
-    vercel: !!process.env.VERCEL,
-    hasDbUrl: !!process.env.DATABASE_URL,
-    hasDbToken: !!process.env.DATABASE_AUTH_TOKEN,
-    hasSessionSecret: !!process.env.SESSION_SECRET,
-  });
-});
 module.exports = app; // buat Vercel
