@@ -9,6 +9,52 @@ const rateLimit = require("express-rate-limit");
 const cookieSession = require("cookie-session");
 const { db, init } = require("./db");
 
+let readyPromise = null;
+async function ensureReady() {
+  if (!readyPromise) {
+    readyPromise = (async () => {
+      await init();
+      const ADMIN_USER = process.env.ADMIN_USER || "adminbos";
+      const ADMIN_PASS = process.env.ADMIN_PASS || "admin123";
+      const r = await db.execute({
+        sql: "SELECT 1 FROM users WHERE username = ?",
+        args: [ADMIN_USER],
+      });
+      if (!r.rows[0]) {
+        const hash = await require("bcryptjs").hash(ADMIN_PASS, 12);
+        await db.execute({
+          sql: "INSERT INTO users (username, password, total_buy, created_at) VALUES (?, ?, 0, datetime('now','localtime'))",
+          args: [ADMIN_USER, hash],
+        });
+        console.log("Seed admin created:", ADMIN_USER);
+      }
+    })().catch((e) => {
+      readyPromise = null;
+      throw e;
+    });
+  }
+  return readyPromise;
+}
+
+// pastikan DB siap sebelum route lain
+app.use(async (req, res, next) => {
+  try {
+    await ensureReady();
+    next();
+  } catch (e) {
+    console.error("INIT FAIL:", e);
+    res.status(500).json({ error: "DB init failed" });
+  }
+});
+
+process.on("unhandledRejection", (e) =>
+  console.error("unhandledRejection:", e),
+);
+process.on("uncaughtException", (e) => console.error("uncaughtException:", e));
+
+if (process.env.VERCEL && !process.env.SESSION_SECRET) {
+  throw new Error("Missing env SESSION_SECRET");
+}
 const app = express();
 
 app.use(helmet());
@@ -156,4 +202,13 @@ if (!process.env.VERCEL) {
   app.listen(port, () => console.log(`Local: http://localhost:${port}`));
 }
 
+app.get("/healthz", (req, res) => {
+  res.json({
+    ok: true,
+    vercel: !!process.env.VERCEL,
+    hasDbUrl: !!process.env.DATABASE_URL,
+    hasDbToken: !!process.env.DATABASE_AUTH_TOKEN,
+    hasSessionSecret: !!process.env.SESSION_SECRET,
+  });
+});
 module.exports = app; // buat Vercel
