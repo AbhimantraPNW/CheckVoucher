@@ -1,12 +1,14 @@
 const express = require("express");
-const { db } = require("../db");
-const requireLogin = require("../middleware/requireLogin");
+const cookieParser = require("cookie-parser");
+const app = express();
 
-const router = express.Router(); // Create an Express Router
+app.use(cookieParser()); // Parse cookies
 
-// Apply the requireLogin middleware directly to the route
-router.get("/me", requireLogin, async (req, res) => {
-  const { id } = req.user || {}; // Access the session data (JWT decoded)
+// Example of protected route
+const requireLogin = require("./middleware/requireLogin"); // Your JWT verification middleware
+
+app.get("/api/me", requireLogin, async (req, res) => {
+  const { id } = req.user || {};
 
   if (!id) {
     return res.status(401).json({ error: "Not authenticated" });
@@ -22,11 +24,13 @@ router.get("/me", requireLogin, async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    res.json(r.rows[0]); // Send user data as JSON
+    res.json(r.rows[0]); // Return user data
   } catch (error) {
     console.error("Error querying database:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
-module.exports = router; // Export the router
+app.listen(3000, () => {
+  console.log("Server is running on port 3000");
+});
