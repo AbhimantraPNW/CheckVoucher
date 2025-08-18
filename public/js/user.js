@@ -7,6 +7,7 @@ async function loadMe() {
   //   return;
   // }
   const me = await res.json();
+  console.log("ini me", me);
   const target = 9;
   const remaining = target - me.total_buy;
 
