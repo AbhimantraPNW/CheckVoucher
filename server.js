@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const cookieSession = require("cookie-session");
+const session = require("express-session");
 const { db, init } = require("./db");
 const app = express();
 
@@ -54,13 +55,21 @@ app.use(helmet());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
+// app.use(
+//   cookieSession({
+//     name: "sid",
+//     keys: [process.env.SESSION_SECRET || ""],
+//     maxAge: 1000 * 60 * 60 * 8, // 8 jam
+//     sameSite: "lax",
+//     secure: process.env.NODE_ENV === "production",
+//   }),
+// );
+
 app.use(
-  cookieSession({
-    name: "sid",
-    keys: [process.env.SESSION_SECRET || ""],
-    maxAge: 1000 * 60 * 60 * 8, // 8 jam
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
   }),
 );
 
