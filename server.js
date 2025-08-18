@@ -65,16 +65,19 @@ app.use(express.static(path.join(__dirname, "public")));
 //   }),
 // );
 
-app.set("trust proxy", 1);
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     httpOnly: true,
-    secure: false,
-    cookie: { secure: true },
-    maxAge: null,
+    secure: process.env.NODE_ENV === "production", // Only enable secure cookies in production
+    cookie: {
+      secure: process.env.NODE_ENV === "production", // Same for cookies
+      httpOnly: true, // Cookie can't be accessed via JavaScript
+      sameSite: "lax", // Allow cookies to be sent with cross-origin requests
+    },
+    maxAge: 1000 * 60 * 60 * 8, // Optional: Set a custom max age for the session cookie
   }),
 );
 
