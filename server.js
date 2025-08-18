@@ -73,6 +73,7 @@ app.use(
     saveUninitialized: false,
     httpOnly: true,
     secure: false,
+    cookie: { secure: true },
     maxAge: null,
   }),
 );
