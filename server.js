@@ -5,9 +5,12 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const cookieSession = require("cookie-session");
 const session = require("express-session");
+const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const { db, init } = require("./db");
 const app = express();
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
 app.set("trust proxy", 1); // Trust first proxy
 
 let readyPromise = null;
@@ -52,13 +55,6 @@ if (process.env.VERCEL && !process.env.SESSION_SECRET) {
   throw new Error("Missing env SESSION_SECRET");
 }
 
-app.use(
-  cors({
-    origin: "https://check-voucher.vercel.app/", // Frontend domain
-    credentials: true, // Enable cookies to be sent
-  }),
-);
-
 app.use(helmet());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -72,6 +68,7 @@ app.use(express.static(path.join(__dirname, "public")));
 //     secure: process.env.NODE_ENV === "production",
 //   }),
 // );
+//
 
 app.use(
   session({
@@ -83,7 +80,7 @@ app.use(
     cookie: {
       secure: process.env.NODE_ENV === "production", // Same for cookies
       httpOnly: true, // Cookie can't be accessed via JavaScript
-      sameSite: "lax", // Allow cookies to be sent with cross-origin requests
+      sameSite: "None", // Allow cookies to be sent with cross-origin requests
     },
     maxAge: 1000 * 60 * 60 * 8, // Optional: Set a custom max age for the session cookie
   }),
@@ -101,9 +98,20 @@ app.use("/register", authLimiter);
 
 // helper auth
 function requireLogin(req, res, next) {
-  if (!req.session?.user) return res.status(401).send("Harus login");
-  next();
+  const token = req.cookies.token;
+
+  if (!token) return res.status(401).send("Harus login");
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).send("Invalid or expired token");
+    }
+
+    req.user = decoded;
+    next();
+  });
 }
+
 function requireAdmin(req, res, next) {
   if (req.session?.user?.role !== "admin")
     return res.status(403).send("Forbidden");
@@ -141,6 +149,7 @@ app.post("/register", async (req, res) => {
 // LOGIN
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
+
   const r = await db.execute({
     sql: "SELECT id, username, password FROM users WHERE username = ?",
     args: [username],
@@ -152,21 +161,41 @@ app.post("/login", async (req, res) => {
   if (!ok) return res.status(401).send("Login gagal");
 
   const role = row.username === "adminbos" ? "admin" : "user";
-  req.session.user = { id: row.id, username: row.username, role };
-  console.log("Session after login:", req.session);
+  const token = jwt.sign(
+    {
+      username: row.username,
+      id: row.id,
+      role: row.username === "adminbos" ? "admin" : "user",
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "8h" }, // Set expiration for the JWT
+  );
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "None",
+  });
+  console.log("Session after login:", token);
 
   res.redirect(role === "admin" ? "/admin.html" : "/user.html");
 });
 
 // LOGOUT
 app.post("/logout", (req, res) => {
-  req.session = null;
-  res.redirect("/login.html");
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).send("Failed Log Out");
+    }
+    res.clearCookie("token");
+    res.redirect("/login.html");
+  });
 });
 
 // ME
 app.get("/api/me", requireLogin, async (req, res) => {
-  const { id } = req.session.user;
+  console.log("ini loh", req);
+  const { id } = req.user;
   const r = await db.execute({
     sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
     args: [id],
