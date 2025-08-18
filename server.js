@@ -144,6 +144,7 @@ app.post("/login", async (req, res) => {
 
   const role = row.username === "adminbos" ? "admin" : "user";
   req.session.user = { id: row.id, username: row.username, role };
+  console.log("Session after login:", req.session);
 
   res.redirect(role === "admin" ? "/admin.html" : "/user.html");
 });
