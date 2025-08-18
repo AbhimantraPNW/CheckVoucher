@@ -1,20 +1,19 @@
 const express = require("express");
-const cookieParser = require("cookie-parser");
-const app = express();
+const { db } = require("../db"); // Database connection
+const requireLogin = require("../middleware/requireLogin");
 
-app.use(cookieParser()); // Parse cookies
+const router = express.Router(); // Create an Express Router
 
-// Example of protected route
-const requireLogin = require("./middleware/requireLogin"); // Your JWT verification middleware
-
-app.get("/api/me", requireLogin, async (req, res) => {
-  const { id } = req.user || {};
+// Apply the requireLogin middleware to the /me route
+router.get("/me", requireLogin, async (req, res) => {
+  const { id } = req.user || {}; // Access the session data (JWT decoded)
 
   if (!id) {
     return res.status(401).json({ error: "Not authenticated" });
   }
 
   try {
+    // Query the database to fetch user data
     const r = await db.execute({
       sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
       args: [id],
@@ -24,13 +23,11 @@ app.get("/api/me", requireLogin, async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    res.json(r.rows[0]); // Return user data
+    res.json(r.rows[0]); // Send user data as JSON
   } catch (error) {
     console.error("Error querying database:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
-});
+module.exports = router; // Export the router
