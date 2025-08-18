@@ -1,6 +1,7 @@
 const { db } = require("../db"); // Import your database connection
 module.exports = async (req, res) => {
   const { id } = req.session?.user || {}; // Access the session data
+  console.log("Session:", req.session);
 
   if (!id) {
     return res.status(401).json({ error: "Not authenticated" });
