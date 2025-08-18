@@ -19,6 +19,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "build": "webpack --env production --env VERCEL_ENV=$VERCEL_ENV"
+    "build": "webpack --env production --env VERCEL_ENV=$VERCEL_ENV",
+    "postinstall": "chmod +x ./node_modules/.bin/webpack"
   }
 }
