@@ -1,9 +1,9 @@
 const { db } = require("../db"); // Import your database connection
 const requireLogin = require("../middleware/requireLogin"); // Import the requireLogin middleware
 
-module.exports = async (req, res, next) => {
+module.exports = async (req, res) => {
   // Apply the requireLogin middleware before processing the request
-  await requireLogin(req, res, next);
+  await requireLogin;
 
   const { id } = req.user || {}; // Access the session data (JWT decoded)
 
