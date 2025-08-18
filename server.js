@@ -60,6 +60,7 @@ app.use(
     keys: [process.env.SESSION_SECRET || ""],
     maxAge: 1000 * 60 * 60 * 8, // 8 jam
     sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
   }),
 );
 
