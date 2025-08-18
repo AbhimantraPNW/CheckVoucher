@@ -70,6 +70,9 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    httpOnly: true,
+    secure: false,
+    maxAge: null,
   }),
 );
 
