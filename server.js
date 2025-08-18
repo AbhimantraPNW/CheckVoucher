@@ -143,12 +143,9 @@ app.get("/api/me", requireLogin, async (req, res) => {
     sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
     args: [id],
   });
-
-  // If the user is not found, return a JSON error
   if (!r.rows[0]) {
     return res.status(404).json({ error: "User not found" });
   }
-
   res.json(r.rows[0]); // Return JSON data
 });
 
