@@ -1,4 +1,3 @@
-// require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const bcrypt = require("bcryptjs");
@@ -8,6 +7,7 @@ const cookieSession = require("cookie-session");
 const session = require("express-session");
 const { db, init } = require("./db");
 const app = express();
+app.set("trust proxy", 1); // Trust first proxy
 
 let readyPromise = null;
 async function ensureReady() {
@@ -86,6 +86,7 @@ const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 50,
   standardHeaders: true,
+  legacyHeaders: false,
 });
 app.use("/login", authLimiter);
 app.use("/register", authLimiter);
