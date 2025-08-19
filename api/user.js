@@ -3,7 +3,7 @@ const { db } = require("../db");
 const requireLogin = require("../middleware/requireLogin");
 const router = express.Router();
 
-router.get("/user", requireLogin, async (req, res) => {
+router.get("/", async (req, res) => {
   const { id } = req.user || {};
 
   console.log(id);

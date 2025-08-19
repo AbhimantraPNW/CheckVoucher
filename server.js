@@ -15,7 +15,7 @@ app.set("trust proxy", 1); // Trust first proxy
 
 // -- API --
 const userRoutes = require("./api/user");
-app.use("/api", userRoutes);
+app.use("/api/user", userRoutes);
 
 let readyPromise = null;
 async function ensureReady() {
