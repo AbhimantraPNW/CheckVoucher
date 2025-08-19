@@ -13,7 +13,13 @@ const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 app.set("trust proxy", 1); // Trust first proxy
 
-app.use(cors());
+// CORS configuration
+const corsOptions = {
+  origin: "https://check-voucher.vercel.app/", // Replace with your actual frontend URL
+  credentials: true, // Allow cookies to be sent with requests
+};
+
+app.use(cors(corsOptions));
 
 // -- API --
 const userRoutes = require("./api/user");
