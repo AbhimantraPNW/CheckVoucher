@@ -13,6 +13,8 @@ const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 app.set("trust proxy", 1); // Trust first proxy
 
+app.use(cors());
+
 // -- API --
 const userRoutes = require("./api/user");
 app.use("/api/user", userRoutes);

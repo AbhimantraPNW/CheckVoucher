@@ -3,11 +3,9 @@ const { db } = require("../db");
 const requireLogin = require("../middleware/requireLogin");
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+router.get("/", requireLogin, async (req, res) => {
   const { id } = req.user || {};
 
-  console.log(id);
-  console.log(req.user);
   if (!id) {
     return res.status(401).json({ error: "Not authenticated" });
   }
