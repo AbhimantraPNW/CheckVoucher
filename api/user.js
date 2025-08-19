@@ -1,19 +1,18 @@
 const express = require("express");
-const { db } = require("../db"); // Database connection
+const { db } = require("../db");
 const requireLogin = require("../middleware/requireLogin");
+const router = express.Router();
 
-const router = express.Router(); // Create an Express Router
+router.get("/user", requireLogin, async (req, res) => {
+  const { id } = req.user || {};
 
-// Apply the requireLogin middleware to the /me route
-router.get("/me", requireLogin, async (req, res) => {
-  const { id } = req.user || {}; // Access the session data (JWT decoded)
-
+  console.log(id);
+  console.log(req.user);
   if (!id) {
     return res.status(401).json({ error: "Not authenticated" });
   }
 
   try {
-    // Query the database to fetch user data
     const r = await db.execute({
       sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
       args: [id],
@@ -23,11 +22,11 @@ router.get("/me", requireLogin, async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    res.json(r.rows[0]); // Send user data as JSON
+    res.json(r.rows[0]);
   } catch (error) {
     console.error("Error querying database:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
-module.exports = router; // Export the router
+module.exports = router;

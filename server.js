@@ -10,10 +10,12 @@ const cors = require("cors");
 const { db, init } = require("./db");
 const app = express();
 const cookieParser = require("cookie-parser");
-const apiRoutes = require("./api/me");
 app.use(cookieParser());
 app.set("trust proxy", 1); // Trust first proxy
-app.use("/api", apiRoutes);
+
+// -- API --
+const userRoutes = require("./api/user");
+app.use("/api", userRoutes);
 
 let readyPromise = null;
 async function ensureReady() {
@@ -99,20 +101,20 @@ app.use("/login", authLimiter);
 app.use("/register", authLimiter);
 
 // helper auth
-function requireLogin(req, res, next) {
-  const token = req.cookies.token;
-
-  if (!token) return res.status(401).send("Harus login");
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(401).send("Invalid or expired token");
-    }
-
-    req.user = decoded;
-    next();
-  });
-}
+// function requireLogin(req, res, next) {
+//   const token = req.cookies.token;
+//
+//   if (!token) return res.status(401).send("Harus login");
+//
+//   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+//     if (err) {
+//       return res.status(401).send("Invalid or expired token");
+//     }
+//
+//     req.user = decoded;
+//     next();
+//   });
+// }
 
 function requireAdmin(req, res, next) {
   if (req.session?.user?.role !== "admin")
@@ -194,41 +196,40 @@ app.post("/logout", (req, res) => {
 });
 
 // ME
-app.get("/api/me", requireLogin, async (req, res) => {
-  console.log("ini loh", req);
-  const { id } = req.user;
-  const r = await db.execute({
-    sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
-    args: [id],
-  });
-  if (!r.rows[0]) {
-    return res.status(404).json({ error: "User not found" });
-  }
-  res.json(r.rows[0]); // Return JSON data
-});
+// app.get("/api/me", requireLogin, async (req, res) => {
+//   const { id } = req.user;
+//   const r = await db.execute({
+//     sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
+//     args: [id],
+//   });
+//   if (!r.rows[0]) {
+//     return res.status(404).json({ error: "User not found" });
+//   }
+//   res.json(r.rows[0]);
+// });
 
 // USERS (admin)
-app.get("/api/users", requireLogin, requireAdmin, async (req, res) => {
-  const r = await db.execute(
-    "SELECT id, username, total_buy, created_at FROM users ORDER BY id ASC",
-  );
-  res.json(r.rows);
-});
+// app.get("/api/users", requireLogin, requireAdmin, async (req, res) => {
+//   const r = await db.execute(
+//     "SELECT id, username, total_buy, created_at FROM users ORDER BY id ASC",
+//   );
+//   res.json(r.rows);
+// });
 
 // INCREMENT
-app.post("/api/users/:id/increment", requireLogin, async (req, res) => {
-  const { id } = req.params;
-  await db.execute({
-    sql: "UPDATE users SET total_buy = (COALESCE(total_buy,0)+1) % 10 WHERE id = ?",
-    args: [id],
-  });
-  const r = await db.execute({
-    sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
-    args: [id],
-  });
-  if (!r.rows[0]) return res.status(404).json({ error: "User not found" });
-  res.json(r.rows[0]);
-});
+// app.post("/api/users/:id/increment", requireLogin, async (req, res) => {
+//   const { id } = req.params;
+//   await db.execute({
+//     sql: "UPDATE users SET total_buy = (COALESCE(total_buy,0)+1) % 10 WHERE id = ?",
+//     args: [id],
+//   });
+//   const r = await db.execute({
+//     sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
+//     args: [id],
+//   });
+//   if (!r.rows[0]) return res.status(404).json({ error: "User not found" });
+//   res.json(r.rows[0]);
+// });
 
 // // init + seed admin
 (async () => {

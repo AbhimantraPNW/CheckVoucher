@@ -1,11 +1,11 @@
 async function loadMe() {
-  const res = await fetch("/api/me", { credentials: "include" });
+  const res = await fetch("/api/user", { credentials: "include" });
   console.log("ini res", res);
-  if (!res.ok) {
-    console.error("Unauthorized:", res.status);
-    location.href = "/login.html"; // Redirect to login page
-    return;
-  }
+  // if (!res.ok) {
+  //   console.error("Unauthorized:", res.status);
+  //   location.href = "/login.html";
+  //   return;
+  // }
   const me = await res.json();
   console.log("ini me", me);
   const target = 9;
