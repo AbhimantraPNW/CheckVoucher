@@ -178,7 +178,6 @@ app.post("/login", async (req, res) => {
     secure: process.env.NODE_ENV === "production",
     sameSite: "None",
   });
-  console.log("Session after login:", token);
 
   res.redirect(role === "admin" ? "/admin.html" : "/user.html");
 });
