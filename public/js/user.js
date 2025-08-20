@@ -1,13 +1,13 @@
 async function loadMe() {
   const res = await fetch("/user", { credentials: "include" });
-  console.log("ini res", res);
-  // if (!res.ok) {
-  //   console.error("Unauthorized:", res.status);
-  //   location.href = "/login.html";
-  //   return;
-  // }
+  // console.log("ini res", res);
+  if (!res.ok) {
+    console.error("Unauthorized:", res.status);
+    location.href = "/login.html";
+    return;
+  }
   const me = await res.json();
-  console.log("ini me", me);
+  // console.log("ini me", me);
   const target = 9;
   const remaining = target - me.total_buy;
 
