@@ -12,69 +12,15 @@ const app = express();
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 app.set("trust proxy", 1); // Trust first proxy
-
 app.use(cors());
 
 // -- API --
 // const userRoutes = require("./api/user");
 // app.use("/api/user", userRoutes);
 
-// let readyPromise = null;
-// async function ensureReady() {
-//   if (!readyPromise) {
-//     readyPromise = (async () => {
-//       await init();
-//       const ADMIN_USER = process.env.ADMIN_USER || "adminbos";
-//       const ADMIN_PASS = process.env.ADMIN_PASS || "admin123";
-//       const r = await db.execute({
-//         sql: "SELECT 1 FROM users WHERE username = ?",
-//         args: [ADMIN_USER],
-//       });
-//       if (!r.rows[0]) {
-//         const hash = await require("bcryptjs").hash(ADMIN_PASS, 12);
-//         await db.execute({
-//           sql: "INSERT INTO users (username, password, total_buy, created_at) VALUES (?, ?, 0, datetime('now','localtime'))",
-//           args: [ADMIN_USER, hash],
-//         });
-//         console.log("Seed admin created:", ADMIN_USER);
-//       }
-//     })().catch((e) => {
-//       readyPromise = null;
-//       throw e;
-//     });
-//   }
-//   return readyPromise;
-// }
-//
-// // pastikan DB siap sebelum route lain
-// app.use(async (req, res, next) => {
-//   try {
-//     await ensureReady();
-//     next();
-//   } catch (e) {
-//     console.error("INIT FAIL:", e);
-//     res.status(500).json({ error: "DB init failed" });
-//   }
-// });
-//
-// if (process.env.VERCEL && !process.env.SESSION_SECRET) {
-//   throw new Error("Missing env SESSION_SECRET");
-// }
-
 app.use(helmet());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
-
-// app.use(
-//   cookieSession({
-//     name: "sid",
-//     keys: [process.env.SESSION_SECRET || ""],
-//     maxAge: 1000 * 60 * 60 * 8, // 8 jam
-//     sameSite: "lax",
-//     secure: process.env.NODE_ENV === "production",
-//   }),
-// );
-//
 
 app.use(
   session({
@@ -119,19 +65,37 @@ function requireLogin(req, res, next) {
 }
 
 function requireAdmin(req, res, next) {
-  if (req.session?.user?.role !== "admin")
-    return res.status(403).send("Forbidden");
+  if (req.user?.role !== "admin") return res.status(403).send("Forbidden");
   next();
 }
 
-// pages
-app.get("/", (req, res) => res.send("Halo Lur")); // optional
+// METHOD GET
+app.get("/", (req, res) =>
+  res.sendFile(path.join(__dirname, "public", "login.html")),
+);
 app.get("/register", (req, res) =>
   res.sendFile(path.join(__dirname, "public", "register.html")),
 );
 app.get("/login", (req, res) =>
   res.sendFile(path.join(__dirname, "public", "login.html")),
 );
+app.get("/user", requireLogin, async (req, res) => {
+  const { id } = req.user;
+  const r = await db.execute({
+    sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
+    args: [id],
+  });
+  if (!r.rows[0]) {
+    return res.status(404).json({ error: "User not found" });
+  }
+  res.json(r.rows[0]);
+});
+app.get("/users", requireLogin, requireAdmin, async (req, res) => {
+  const r = await db.execute(
+    "SELECT id, username, total_buy, created_at FROM users ORDER BY id ASC",
+  );
+  res.json(r.rows);
+});
 
 // REGISTER
 app.post("/register", async (req, res) => {
@@ -219,19 +183,19 @@ app.get("/user", requireLogin, async (req, res) => {
 // });
 
 // INCREMENT
-// app.post("/api/users/:id/increment", requireLogin, async (req, res) => {
-//   const { id } = req.params;
-//   await db.execute({
-//     sql: "UPDATE users SET total_buy = (COALESCE(total_buy,0)+1) % 10 WHERE id = ?",
-//     args: [id],
-//   });
-//   const r = await db.execute({
-//     sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
-//     args: [id],
-//   });
-//   if (!r.rows[0]) return res.status(404).json({ error: "User not found" });
-//   res.json(r.rows[0]);
-// });
+app.post("/users/:id/increment", requireLogin, async (req, res) => {
+  const { id } = req.params;
+  await db.execute({
+    sql: "UPDATE users SET total_buy = (COALESCE(total_buy,0)+1) % 10 WHERE id = ?",
+    args: [id],
+  });
+  const r = await db.execute({
+    sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
+    args: [id],
+  });
+  if (!r.rows[0]) return res.status(404).json({ error: "User not found" });
+  res.json(r.rows[0]);
+});
 
 // // init + seed admin
 (async () => {

@@ -20,7 +20,7 @@ function formatDateTime(isoString) {
 }
 
 async function fetchUsers() {
-  const res = await fetch("/api/users", { credentials: "include" });
+  const res = await fetch("/users", { credentials: "include" });
   if (!res.ok) {
     location.href = "/login.html";
     return;
@@ -66,7 +66,7 @@ rowsEl.addEventListener("click", async (e) => {
 
   btn.disabled = true;
   try {
-    const res = await fetch(`/api/users/${id}/increment`, {
+    const res = await fetch(`/users/${id}/increment`, {
       method: "POST",
       credentials: "include",
     });
