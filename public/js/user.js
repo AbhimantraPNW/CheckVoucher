@@ -1,5 +1,5 @@
 async function loadMe() {
-  const res = await fetch("/api/user", { credentials: "include" });
+  const res = await fetch("/user", { credentials: "include" });
   console.log("ini res", res);
   // if (!res.ok) {
   //   console.error("Unauthorized:", res.status);

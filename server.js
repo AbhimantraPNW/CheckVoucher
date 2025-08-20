@@ -198,7 +198,7 @@ app.post("/logout", (req, res) => {
 });
 
 // ME
-app.get("/api/user", requireLogin, async (req, res) => {
+app.get("/user", requireLogin, async (req, res) => {
   const { id } = req.user;
   const r = await db.execute({
     sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
