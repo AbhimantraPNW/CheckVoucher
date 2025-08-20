@@ -13,59 +13,53 @@ const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 app.set("trust proxy", 1); // Trust first proxy
 
-// CORS configuration
-const corsOptions = {
-  origin: "https://check-voucher.vercel.app/", // Replace with your actual frontend URL
-  credentials: true, // Allow cookies to be sent with requests
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 
 // -- API --
-const userRoutes = require("./api/user");
-app.use("/api/user", userRoutes);
+// const userRoutes = require("./api/user");
+// app.use("/api/user", userRoutes);
 
-let readyPromise = null;
-async function ensureReady() {
-  if (!readyPromise) {
-    readyPromise = (async () => {
-      await init();
-      const ADMIN_USER = process.env.ADMIN_USER || "adminbos";
-      const ADMIN_PASS = process.env.ADMIN_PASS || "admin123";
-      const r = await db.execute({
-        sql: "SELECT 1 FROM users WHERE username = ?",
-        args: [ADMIN_USER],
-      });
-      if (!r.rows[0]) {
-        const hash = await require("bcryptjs").hash(ADMIN_PASS, 12);
-        await db.execute({
-          sql: "INSERT INTO users (username, password, total_buy, created_at) VALUES (?, ?, 0, datetime('now','localtime'))",
-          args: [ADMIN_USER, hash],
-        });
-        console.log("Seed admin created:", ADMIN_USER);
-      }
-    })().catch((e) => {
-      readyPromise = null;
-      throw e;
-    });
-  }
-  return readyPromise;
-}
-
-// pastikan DB siap sebelum route lain
-app.use(async (req, res, next) => {
-  try {
-    await ensureReady();
-    next();
-  } catch (e) {
-    console.error("INIT FAIL:", e);
-    res.status(500).json({ error: "DB init failed" });
-  }
-});
-
-if (process.env.VERCEL && !process.env.SESSION_SECRET) {
-  throw new Error("Missing env SESSION_SECRET");
-}
+// let readyPromise = null;
+// async function ensureReady() {
+//   if (!readyPromise) {
+//     readyPromise = (async () => {
+//       await init();
+//       const ADMIN_USER = process.env.ADMIN_USER || "adminbos";
+//       const ADMIN_PASS = process.env.ADMIN_PASS || "admin123";
+//       const r = await db.execute({
+//         sql: "SELECT 1 FROM users WHERE username = ?",
+//         args: [ADMIN_USER],
+//       });
+//       if (!r.rows[0]) {
+//         const hash = await require("bcryptjs").hash(ADMIN_PASS, 12);
+//         await db.execute({
+//           sql: "INSERT INTO users (username, password, total_buy, created_at) VALUES (?, ?, 0, datetime('now','localtime'))",
+//           args: [ADMIN_USER, hash],
+//         });
+//         console.log("Seed admin created:", ADMIN_USER);
+//       }
+//     })().catch((e) => {
+//       readyPromise = null;
+//       throw e;
+//     });
+//   }
+//   return readyPromise;
+// }
+//
+// // pastikan DB siap sebelum route lain
+// app.use(async (req, res, next) => {
+//   try {
+//     await ensureReady();
+//     next();
+//   } catch (e) {
+//     console.error("INIT FAIL:", e);
+//     res.status(500).json({ error: "DB init failed" });
+//   }
+// });
+//
+// if (process.env.VERCEL && !process.env.SESSION_SECRET) {
+//   throw new Error("Missing env SESSION_SECRET");
+// }
 
 app.use(helmet());
 app.use(express.urlencoded({ extended: true }));
@@ -88,13 +82,13 @@ app.use(
     resave: false,
     saveUninitialized: false,
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // Only enable secure cookies in production
+    secure: process.env.NODE_ENV === "production",
     cookie: {
-      secure: process.env.NODE_ENV === "production", // Same for cookies
-      httpOnly: true, // Cookie can't be accessed via JavaScript
-      sameSite: "None", // Allow cookies to be sent with cross-origin requests
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      sameSite: "None",
     },
-    maxAge: 1000 * 60 * 60 * 8, // Optional: Set a custom max age for the session cookie
+    maxAge: 1000 * 60 * 60 * 8,
   }),
 );
 
@@ -109,20 +103,20 @@ app.use("/login", authLimiter);
 app.use("/register", authLimiter);
 
 // helper auth
-// function requireLogin(req, res, next) {
-//   const token = req.cookies.token;
-//
-//   if (!token) return res.status(401).send("Harus login");
-//
-//   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-//     if (err) {
-//       return res.status(401).send("Invalid or expired token");
-//     }
-//
-//     req.user = decoded;
-//     next();
-//   });
-// }
+function requireLogin(req, res, next) {
+  const token = req.cookies.token;
+
+  if (!token) return res.status(401).send("Harus login");
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).send("Invalid or expired token");
+    }
+
+    req.user = decoded;
+    next();
+  });
+}
 
 function requireAdmin(req, res, next) {
   if (req.session?.user?.role !== "admin")
@@ -204,17 +198,17 @@ app.post("/logout", (req, res) => {
 });
 
 // ME
-// app.get("/api/me", requireLogin, async (req, res) => {
-//   const { id } = req.user;
-//   const r = await db.execute({
-//     sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
-//     args: [id],
-//   });
-//   if (!r.rows[0]) {
-//     return res.status(404).json({ error: "User not found" });
-//   }
-//   res.json(r.rows[0]);
-// });
+app.get("/api/user", requireLogin, async (req, res) => {
+  const { id } = req.user;
+  const r = await db.execute({
+    sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
+    args: [id],
+  });
+  if (!r.rows[0]) {
+    return res.status(404).json({ error: "User not found" });
+  }
+  res.json(r.rows[0]);
+});
 
 // USERS (admin)
 // app.get("/api/users", requireLogin, requireAdmin, async (req, res) => {
