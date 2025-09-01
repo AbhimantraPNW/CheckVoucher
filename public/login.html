@@ -5,7 +5,7 @@
     <style>
       body {
         font-family: "Poppins", Arial, sans-serif;
-        background: #6a0d0d; /* maroon */
+        background: linear-gradient(135deg, #6a0d0d, #b23a48);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -14,72 +14,99 @@
       }
 
       .login-box {
-        background: #fcecdc; /* cream/beige */
-        padding: 30px 25px;
-        border-radius: 15px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+        background: #fffdf8;
+        padding: 40px 30px;
+        border-radius: 18px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
         text-align: center;
-        width: 320px;
+        width: 350px;
+        animation: fadeIn 0.8s ease-in-out;
+      }
+
+      .login-logo {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       }
 
       .login-box h2 {
-        margin-bottom: 20px;
-        color: #6a0d0d; /* maroon */
+        margin-bottom: 25px;
+        color: #6a0d0d;
         font-weight: bold;
+        font-size: 22px;
       }
 
       .login-box input {
         width: 90%;
         padding: 12px;
         margin: 10px 0;
-        border: 2px solid #6a0d0d;
-        border-radius: 8px;
+        border: 2px solid #e0c1b3;
+        border-radius: 10px;
         outline: none;
-        transition: 0.2s;
-        background: #fffdf8;
+        transition: all 0.3s ease;
+        background: #fff;
+        font-size: 15px;
       }
 
       .login-box input:focus {
-        border-color: #d47f4d; /* warm coffee brown */
-        box-shadow: 0 0 5px #d47f4d;
+        border-color: #d47f4d;
+        box-shadow: 0 0 6px rgba(212, 127, 77, 0.5);
       }
 
       .login-box button {
-        width: 100%;
+        width: 95%;
         padding: 12px;
-        margin-top: 15px;
-        background: #6a0d0d; /* maroon */
+        margin-top: 20px;
+        background: #6a0d0d;
         border: none;
-        border-radius: 8px;
-        color: #fcecdc; /* cream text */
+        border-radius: 10px;
+        color: #fffdf8;
         font-weight: bold;
+        font-size: 15px;
         cursor: pointer;
-        transition: 0.3s;
+        transition: background 0.3s ease;
       }
 
       .login-box button:hover {
-        background: #8b1e1e; /* darker maroon */
+        background: #8b1e1e;
       }
 
       .login-box p {
-        margin-top: 15px;
+        margin-top: 20px;
         font-size: 14px;
-        color: #6a0d0d;
+        color: #333;
       }
 
       .login-box a {
-        color: #d47f4d; /* warm coffee brown */
+        color: #d47f4d;
         text-decoration: none;
         font-weight: bold;
+        transition: color 0.3s ease;
       }
 
       .login-box a:hover {
+        color: #a8562b;
         text-decoration: underline;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
     </style>
   </head>
   <body>
     <div class="login-box">
+      <img src="/images/com.jpg" alt="Logo" class="login-logo" />
       <h2>Login Lur!</h2>
       <form action="/login" method="POST">
         <input name="username" placeholder="Username" required />
