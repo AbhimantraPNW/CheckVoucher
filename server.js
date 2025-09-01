@@ -9,6 +9,7 @@ const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const { db, init } = require("./db");
 const app = express();
+const favicon = require("serve-favicon");
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 app.set("trust proxy", 1); // Trust first proxy
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
+app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
 
 app.use(
   session({

@@ -16,7 +16,7 @@
 
       .user-box {
         background: #fffdf8;
-        padding: 35px 25px;
+        padding: 5px 25px;
         border-radius: 20px;
         box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
         text-align: center;
@@ -42,18 +42,27 @@
         font-size: 18px;
         color: #6a0d0d;
         text-transform: uppercase;
+        margin-top: 30px;
       }
 
       #free {
-        font-weight: bold;
-        color: #d47f4d;
-        font-size: 18px;
+        font-weight: 700;
+        color: #e85d04;
+        font-size: 16px;
+        background: linear-gradient(90deg, #fff3e0, #ffe5d9);
+        padding: 10px 14px;
+        border-radius: 12px;
+        display: inline-block;
+        margin-top: 12px;
+        box-shadow: 0 4px 12px rgba(232, 93, 4, 0.2);
+        animation: pulse 1.8s infinite;
       }
 
       .user-box button {
         width: 100%;
         padding: 14px;
         margin-top: 10px;
+        margin-bottom: 30px;
         background: #6a0d0d;
         border: none;
         border-radius: 12px;
@@ -67,6 +76,56 @@
       .user-box button:hover {
         background: #8b1e1e;
         transform: translateY(-2px);
+      }
+
+      .progress-container {
+        width: 100%;
+        background: #f3f3f3;
+        border-radius: 12px;
+        overflow: hidden;
+        margin: 12px 0;
+        height: 20px;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      #progress-bar {
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, #e85d04, #ff9f1c);
+        border-radius: 12px;
+        transition: width 0.6s ease;
+      }
+
+      #progress-text {
+        font-size: 15px;
+        font-weight: 600;
+        color: #6a0d0d;
+        margin-top: 5px;
+      }
+
+      .user-box .voucher-title {
+        font-size: 26px;
+        font-weight: 700;
+        color: #6a0d0d;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        padding-bottom: 8px;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+          box-shadow: 0 0 0 rgba(232, 93, 4, 0.4);
+        }
+        50% {
+          transform: scale(1.05);
+          box-shadow: 0 0 18px rgba(232, 93, 4, 0.5);
+        }
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 0 rgba(232, 93, 4, 0.4);
+        }
       }
 
       @keyframes fadeIn {
@@ -104,9 +163,13 @@
   </head>
   <body>
     <div class="user-box">
-      <h2>🎟️ Voucher Kamu</h2>
+      <h2 class="voucher-title">Voucher CoffeeOnMonday</h2>
       <p id="greet"></p>
-      <p id="total"></p>
+      <!-- <p id="total"></p> -->
+      <div class="progress-container">
+        <div id="progress-bar"></div>
+      </div>
+      <p id="progress-text"></p>
       <p id="free"></p>
 
       <form action="/logout" method="POST">

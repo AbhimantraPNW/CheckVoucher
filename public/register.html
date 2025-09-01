@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Register</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
       body {
         font-family: "Poppins", Arial, sans-serif;
@@ -15,11 +16,13 @@
 
       .register-box {
         background: #fcecdc; /* cream/beige */
-        padding: 30px 25px;
-        border-radius: 15px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+        padding: 20px;
+        border-radius: 18px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
         text-align: center;
-        width: 320px;
+        width: 350px;
+        animation: fadeIn 0.8s ease-in-out;
+        text-align: center;
       }
 
       .register-box h2 {
@@ -75,6 +78,24 @@
 
       .register-box a:hover {
         text-decoration: underline;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .register-box {
+          max-width: 300px;
+          padding: 40px;
+        }
       }
     </style>
   </head>
