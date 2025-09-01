@@ -13,6 +13,8 @@ const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 app.set("trust proxy", 1); // Trust first proxy
 app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // -- API --
 // const userRoutes = require("./api/user");
@@ -92,7 +94,7 @@ app.get("/user", requireLogin, async (req, res) => {
 });
 app.get("/users", requireLogin, requireAdmin, async (req, res) => {
   const r = await db.execute(
-    "SELECT id, username, total_buy, created_at FROM users ORDER BY id ASC",
+    "SELECT id, username, total_buy, created_at, last_buy FROM users ORDER BY id ASC",
   );
   res.json(r.rows);
 });
@@ -170,6 +172,22 @@ app.post("/users/:id/increment", requireLogin, async (req, res) => {
   });
   const r = await db.execute({
     sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
+    args: [id],
+  });
+  if (!r.rows[0]) return res.status(404).json({ error: "User not found" });
+  res.json(r.rows[0]);
+});
+
+// DATE
+app.post("/users/:id/lastbuy", requireLogin, async (req, res) => {
+  const { id } = req.params;
+  const { last_buy } = req.body;
+  await db.execute({
+    sql: "UPDATE users SET last_buy = ? WHERE id = ?",
+    args: [last_buy, id],
+  });
+  const r = await db.execute({
+    sql: "SELECT id, username, total_buy, created_at, last_buy FROM users WHERE id = ?",
     args: [id],
   });
   if (!r.rows[0]) return res.status(404).json({ error: "User not found" });

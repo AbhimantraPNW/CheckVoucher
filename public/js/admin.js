@@ -41,6 +41,14 @@ function render(list) {
         <button class="inc" aria-label="Tambah 1 untuk ${escapeHtml(u.username)}">+1</button>
       </td>
       <td>${u.created_at ? formatDateTime(u.created_at) : ""}</td>
+      <td>
+      <input 
+        type="text" 
+        class="lastbuy-input" 
+        placeholder="dd Mmm yyyy" 
+        value="${u.last_buy ?? ""}"
+      />
+      </td>
     </tr>
   `,
     )
@@ -85,6 +93,44 @@ rowsEl.addEventListener("click", async (e) => {
     tr.querySelector(".total").textContent = updated.total_buy ?? 0;
   } finally {
     btn.disabled = false;
+  }
+});
+
+// event delegation update last buy
+rowsEl.addEventListener("change", async (e) => {
+  const input = e.target.closest(".lastbuy-input");
+  if (!input) return;
+
+  const tr = input.closest("tr");
+  const id = tr?.dataset?.id;
+  if (!id) return;
+
+  const newDate = input.value.trim();
+  if (!newDate) return;
+
+  try {
+    const res = await fetch(`/users/${id}/lastbuy`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ last_buy: newDate }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      alert(err.error || "Gagal update tanggal");
+      return;
+    }
+    const updated = await res.json();
+
+    // update
+    const idx = ALL_USERS.findIndex((u) => String(u.id) === String(id));
+    if (idx >= 0) ALL_USERS[idx].last_buy = updated.last_buy;
+
+    // update tampilan baris ini
+    tr.querySelector(".lastbuy").textContent = updated.last_buy ?? "-";
+  } catch (err) {
+    console.error("update last buy fail", err);
   }
 });
 
