@@ -1,11 +1,12 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <title>User</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Dashboard</title>
     <style>
       body {
         font-family: "Poppins", Arial, sans-serif;
-        background: #6a0d0d; /* maroon */
+        background: linear-gradient(135deg, #6a0d0d, #b23a48);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -14,62 +15,96 @@
       }
 
       .user-box {
-        background: #fcecdc; /* cream */
-        padding: 30px 25px;
-        border-radius: 15px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+        background: #fffdf8;
+        padding: 35px 25px;
+        border-radius: 20px;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
         text-align: center;
-        width: 40vw;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+        width: 380px;
+        animation: fadeIn 0.8s ease-in-out;
       }
 
       .user-box h2 {
         margin-bottom: 20px;
         color: #6a0d0d;
         font-weight: bold;
+        font-size: 24px;
       }
 
       .user-box p {
-        font-size: 20px;
-        margin: 10px 0;
-        color: #333;
+        font-size: 18px;
+        margin: 12px 0;
+        color: #444;
       }
 
       #greet {
         font-weight: bold;
-        font-size: 16px;
+        font-size: 18px;
         color: #6a0d0d;
         text-transform: uppercase;
       }
 
       #free {
         font-weight: bold;
-        color: #d47f4d; /* coffee brown */
+        color: #d47f4d;
+        font-size: 18px;
       }
 
       .user-box button {
         width: 100%;
-        padding: 12px;
-        margin-top: 15px;
-        background: #6a0d0d; /* maroon */
+        padding: 14px;
+        margin-top: 10px;
+        background: #6a0d0d;
         border: none;
-        border-radius: 8px;
-        color: #fcecdc; /* cream */
+        border-radius: 12px;
+        color: #fffdf8;
         font-weight: bold;
+        font-size: 16px;
         cursor: pointer;
-        transition: 0.3s;
+        transition: all 0.3s ease;
       }
 
       .user-box button:hover {
         background: #8b1e1e;
+        transform: translateY(-2px);
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Mobile Responsive */
+      @media (max-width: 768px) {
+        .user-box {
+          max-width: 300px;
+          padding: 40px;
+        }
+
+        .user-box h2 {
+          font-size: 22px;
+        }
+
+        .user-box p {
+          font-size: 16px;
+        }
+
+        .user-box button {
+          font-size: 15px;
+          padding: 12px;
+        }
       }
     </style>
   </head>
   <body>
     <div class="user-box">
-      <h2>🎟️ Vouchermu Lur!</h2>
+      <h2>🎟️ Voucher Kamu</h2>
       <p id="greet"></p>
       <p id="total"></p>
       <p id="free"></p>
