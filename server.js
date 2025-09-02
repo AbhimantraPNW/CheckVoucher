@@ -39,14 +39,8 @@ app.use(
   }),
 );
 
-// const authLimiter = rateLimit({
-//   windowMs: 15 * 60 * 1000,
-//   max: 50,
-//   standardHeaders: true,
-//   legacyHeaders: false,
-// });
-
 // -- API --
+const getRoutes = require("./public/api/getRoutes");
 const usersRoutes = require("./public/api/users");
 const userRoutes = require("./public/api/user");
 const loginRoutes = require("./public/api/login");
@@ -54,6 +48,7 @@ const registerRoutes = require("./public/api/register");
 const logoutRoutes = require("./public/api/logout");
 const addVoucherRoutes = require("./public/api/addvoucher");
 const lastBuyRoutes = require("./public/api/lastbuy");
+app.use("/", getRoutes);
 app.use("/users", usersRoutes);
 app.use("/users", addVoucherRoutes);
 app.use("/users", lastBuyRoutes);
@@ -62,151 +57,6 @@ app.use("/login", loginRoutes);
 app.use("/register", registerRoutes);
 app.use("/logout", logoutRoutes);
 
-// helper auth
-function requireLogin(req, res, next) {
-  const token = req.cookies.token;
-
-  if (!token) return res.status(401).send("Harus login");
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(401).send("Invalid or expired token");
-    }
-
-    req.user = decoded;
-    next();
-  });
-}
-
-// function requireAdmin(req, res, next) {
-//   if (req.user?.role !== "admin") return res.status(403).send("Forbidden");
-//   next();
-// }
-
-// METHOD GET
-app.get("/", (req, res) =>
-  res.sendFile(path.join(__dirname, "public", "login.html")),
-);
-app.get("/register", (req, res) =>
-  res.sendFile(path.join(__dirname, "public", "register.html")),
-);
-app.get("/login", (req, res) =>
-  res.sendFile(path.join(__dirname, "public", "login.html")),
-);
-// app.get("/user", requireLogin, async (req, res) => {
-//   const { id } = req.user;
-//   const r = await db.execute({
-//     sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
-//     args: [id],
-//   });
-//   if (!r.rows[0]) {
-//     return res.status(404).json({ error: "User not found" });
-//   }
-//   res.json(r.rows[0]);
-// });
-// app.get("/users", requireLogin, requireAdmin, async (req, res) => {
-//   const r = await db.execute(
-//     "SELECT id, username, total_buy, created_at, last_buy FROM users ORDER BY id ASC",
-//   );
-//   res.json(r.rows);
-// });
-
-// REGISTER
-// app.post("/register", async (req, res) => {
-//   const { username, password } = req.body;
-//   if (!username || !password)
-//     return res.status(400).send("Username & password wajib");
-//   try {
-//     const hash = await bcrypt.hash(password, 12);
-//     await db.execute({
-//       sql: "INSERT INTO users (username, password, total_buy, created_at, last_buy) VALUES (?, ?, 0, datetime('now','localtime'), ?)",
-//       args: [username, hash],
-//     });
-//     res.redirect("/login.html");
-//   } catch (e) {
-//     if (String(e.message).includes("UNIQUE"))
-//       return res.status(409).send("Username sudah dipakai");
-//     res.status(500).send("Gagal daftar");
-//   }
-// });
-
-// LOGIN
-// app.post("/login", async (req, res) => {
-//   const { username, password } = req.body;
-//
-//   const r = await db.execute({
-//     sql: "SELECT id, username, password FROM users WHERE username = ?",
-//     args: [username],
-//   });
-//   const row = r.rows[0];
-//   if (!row) return res.status(401).send("Login gagal");
-//
-//   const ok = await bcrypt.compare(password, row.password);
-//   if (!ok) return res.status(401).send("Login gagal");
-//
-//   const role = row.username === "adminbos" ? "admin" : "user";
-//   const token = jwt.sign(
-//     {
-//       username: row.username,
-//       id: row.id,
-//       role: row.username === "adminbos" ? "admin" : "user",
-//     },
-//     process.env.JWT_SECRET,
-//     { expiresIn: "8h" }, // Set expiration for the JWT
-//   );
-//
-//   res.cookie("token", token, {
-//     httpOnly: true,
-//     secure: process.env.NODE_ENV === "production",
-//     sameSite: "None",
-//   });
-//
-//   res.redirect(role === "admin" ? "/admin.html" : "/user.html");
-// });
-
-// LOGOUT
-// app.post("/logout", (req, res) => {
-//   req.session.destroy((err) => {
-//     if (err) {
-//       return res.status(500).send("Failed Log Out");
-//     }
-//     res.clearCookie("token");
-//     res.redirect("/login.html");
-//   });
-// });
-
-// INCREMENT
-// app.post("/users/:id/increment", requireLogin, async (req, res) => {
-//   const { id } = req.params;
-//   await db.execute({
-//     sql: "UPDATE users SET total_buy = (COALESCE(total_buy,0)+1) % 10 WHERE id = ?",
-//     args: [id],
-//   });
-//   const r = await db.execute({
-//     sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
-//     args: [id],
-//   });
-//   if (!r.rows[0]) return res.status(404).json({ error: "User not found" });
-//   res.json(r.rows[0]);
-// });
-
-// DATE
-// app.post("/users/:id/lastbuy", requireLogin, async (req, res) => {
-//   const { id } = req.params;
-//   const { last_buy } = req.body;
-//   await db.execute({
-//     sql: "UPDATE users SET last_buy = ? WHERE id = ?",
-//     args: [last_buy, id],
-//   });
-//   const r = await db.execute({
-//     sql: "SELECT id, username, total_buy, created_at, last_buy FROM users WHERE id = ?",
-//     args: [id],
-//   });
-//   if (!r.rows[0]) return res.status(404).json({ error: "User not found" });
-//   res.json(r.rows[0]);
-// });
-
-// local dev only
 if (!process.env.VERCEL) {
   const port = process.env.PORT || 3000;
   app.listen(port, () => console.log(`Local: http://localhost:${port}`));
