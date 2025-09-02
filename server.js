@@ -1,3 +1,4 @@
+// NOTE: hapus yg tidak terpakai
 const express = require("express");
 const path = require("path");
 const bcrypt = require("bcryptjs");
@@ -18,7 +19,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // -- API --
+const usersRoutes = require("./public/api/users");
 const userRoutes = require("./public/api/user");
+app.use("/users", usersRoutes);
 app.use("/user", userRoutes);
 
 app.use(helmet());
@@ -68,10 +71,10 @@ function requireLogin(req, res, next) {
   });
 }
 
-function requireAdmin(req, res, next) {
-  if (req.user?.role !== "admin") return res.status(403).send("Forbidden");
-  next();
-}
+// function requireAdmin(req, res, next) {
+//   if (req.user?.role !== "admin") return res.status(403).send("Forbidden");
+//   next();
+// }
 
 // METHOD GET
 app.get("/", (req, res) =>
@@ -94,12 +97,12 @@ app.get("/login", (req, res) =>
 //   }
 //   res.json(r.rows[0]);
 // });
-app.get("/users", requireLogin, requireAdmin, async (req, res) => {
-  const r = await db.execute(
-    "SELECT id, username, total_buy, created_at, last_buy FROM users ORDER BY id ASC",
-  );
-  res.json(r.rows);
-});
+// app.get("/users", requireLogin, requireAdmin, async (req, res) => {
+//   const r = await db.execute(
+//     "SELECT id, username, total_buy, created_at, last_buy FROM users ORDER BY id ASC",
+//   );
+//   res.json(r.rows);
+// });
 
 // REGISTER
 app.post("/register", async (req, res) => {
