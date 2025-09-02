@@ -52,7 +52,9 @@ const userRoutes = require("./public/api/user");
 const loginRoutes = require("./public/api/login");
 const registerRoutes = require("./public/api/register");
 const logoutRoutes = require("./public/api/logout");
+const addVoucherRoutes = require("./public/api/addvoucher");
 app.use("/users", usersRoutes);
+app.use("/users", addVoucherRoutes);
 app.use("/user", userRoutes);
 app.use("/login", loginRoutes);
 app.use("/register", registerRoutes);
@@ -172,19 +174,19 @@ app.get("/login", (req, res) =>
 // });
 
 // INCREMENT
-app.post("/users/:id/increment", requireLogin, async (req, res) => {
-  const { id } = req.params;
-  await db.execute({
-    sql: "UPDATE users SET total_buy = (COALESCE(total_buy,0)+1) % 10 WHERE id = ?",
-    args: [id],
-  });
-  const r = await db.execute({
-    sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
-    args: [id],
-  });
-  if (!r.rows[0]) return res.status(404).json({ error: "User not found" });
-  res.json(r.rows[0]);
-});
+// app.post("/users/:id/increment", requireLogin, async (req, res) => {
+//   const { id } = req.params;
+//   await db.execute({
+//     sql: "UPDATE users SET total_buy = (COALESCE(total_buy,0)+1) % 10 WHERE id = ?",
+//     args: [id],
+//   });
+//   const r = await db.execute({
+//     sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
+//     args: [id],
+//   });
+//   if (!r.rows[0]) return res.status(404).json({ error: "User not found" });
+//   res.json(r.rows[0]);
+// });
 
 // DATE
 app.post("/users/:id/lastbuy", requireLogin, async (req, res) => {
