@@ -18,8 +18,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // -- API --
-// const userRoutes = require("./api/user");
-// app.use("/api/user", userRoutes);
+const userRoutes = require("./public/api/user");
+app.use("/user", userRoutes);
 
 app.use(helmet());
 app.use(express.urlencoded({ extended: true }));
@@ -83,17 +83,17 @@ app.get("/register", (req, res) =>
 app.get("/login", (req, res) =>
   res.sendFile(path.join(__dirname, "public", "login.html")),
 );
-app.get("/user", requireLogin, async (req, res) => {
-  const { id } = req.user;
-  const r = await db.execute({
-    sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
-    args: [id],
-  });
-  if (!r.rows[0]) {
-    return res.status(404).json({ error: "User not found" });
-  }
-  res.json(r.rows[0]);
-});
+// app.get("/user", requireLogin, async (req, res) => {
+//   const { id } = req.user;
+//   const r = await db.execute({
+//     sql: "SELECT id, username, total_buy, created_at FROM users WHERE id = ?",
+//     args: [id],
+//   });
+//   if (!r.rows[0]) {
+//     return res.status(404).json({ error: "User not found" });
+//   }
+//   res.json(r.rows[0]);
+// });
 app.get("/users", requireLogin, requireAdmin, async (req, res) => {
   const r = await db.execute(
     "SELECT id, username, total_buy, created_at, last_buy FROM users ORDER BY id ASC",
