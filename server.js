@@ -39,23 +39,24 @@ app.use(
   }),
 );
 
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 50,
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+// const authLimiter = rateLimit({
+//   windowMs: 15 * 60 * 1000,
+//   max: 50,
+//   standardHeaders: true,
+//   legacyHeaders: false,
+// });
 
 // -- API --
 const usersRoutes = require("./public/api/users");
 const userRoutes = require("./public/api/user");
 const loginRoutes = require("./public/api/login");
+const registerRoutes = require("./public/api/register");
 const logoutRoutes = require("./public/api/logout");
 app.use("/users", usersRoutes);
 app.use("/user", userRoutes);
 app.use("/login", loginRoutes);
+app.use("/register", registerRoutes);
 app.use("/logout", logoutRoutes);
-app.use("/register", authLimiter);
 
 // helper auth
 function requireLogin(req, res, next) {
@@ -107,23 +108,23 @@ app.get("/login", (req, res) =>
 // });
 
 // REGISTER
-app.post("/register", async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password)
-    return res.status(400).send("Username & password wajib");
-  try {
-    const hash = await bcrypt.hash(password, 12);
-    await db.execute({
-      sql: "INSERT INTO users (username, password, total_buy, created_at) VALUES (?, ?, 0, datetime('now','localtime'))",
-      args: [username, hash],
-    });
-    res.redirect("/login.html");
-  } catch (e) {
-    if (String(e.message).includes("UNIQUE"))
-      return res.status(409).send("Username sudah dipakai");
-    res.status(500).send("Gagal daftar");
-  }
-});
+// app.post("/register", async (req, res) => {
+//   const { username, password } = req.body;
+//   if (!username || !password)
+//     return res.status(400).send("Username & password wajib");
+//   try {
+//     const hash = await bcrypt.hash(password, 12);
+//     await db.execute({
+//       sql: "INSERT INTO users (username, password, total_buy, created_at, last_buy) VALUES (?, ?, 0, datetime('now','localtime'), ?)",
+//       args: [username, hash],
+//     });
+//     res.redirect("/login.html");
+//   } catch (e) {
+//     if (String(e.message).includes("UNIQUE"))
+//       return res.status(409).send("Username sudah dipakai");
+//     res.status(500).send("Gagal daftar");
+//   }
+// });
 
 // LOGIN
 // app.post("/login", async (req, res) => {
