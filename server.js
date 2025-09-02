@@ -13,16 +13,10 @@ const app = express();
 const favicon = require("serve-favicon");
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
-app.set("trust proxy", 1); // Trust first proxy
+app.set("trust proxy", 1);
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// -- API --
-const usersRoutes = require("./public/api/users");
-const userRoutes = require("./public/api/user");
-app.use("/users", usersRoutes);
-app.use("/user", userRoutes);
 
 app.use(helmet());
 app.use(express.urlencoded({ extended: true }));
@@ -45,14 +39,22 @@ app.use(
   }),
 );
 
-// limit
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 50,
   standardHeaders: true,
   legacyHeaders: false,
 });
-app.use("/login", authLimiter);
+
+// -- API --
+const usersRoutes = require("./public/api/users");
+const userRoutes = require("./public/api/user");
+const loginRoutes = require("./public/api/login");
+const logoutRoutes = require("./public/api/logout");
+app.use("/users", usersRoutes);
+app.use("/user", userRoutes);
+app.use("/login", loginRoutes);
+app.use("/logout", logoutRoutes);
 app.use("/register", authLimiter);
 
 // helper auth
@@ -124,49 +126,49 @@ app.post("/register", async (req, res) => {
 });
 
 // LOGIN
-app.post("/login", async (req, res) => {
-  const { username, password } = req.body;
-
-  const r = await db.execute({
-    sql: "SELECT id, username, password FROM users WHERE username = ?",
-    args: [username],
-  });
-  const row = r.rows[0];
-  if (!row) return res.status(401).send("Login gagal");
-
-  const ok = await bcrypt.compare(password, row.password);
-  if (!ok) return res.status(401).send("Login gagal");
-
-  const role = row.username === "adminbos" ? "admin" : "user";
-  const token = jwt.sign(
-    {
-      username: row.username,
-      id: row.id,
-      role: row.username === "adminbos" ? "admin" : "user",
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: "8h" }, // Set expiration for the JWT
-  );
-
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "None",
-  });
-
-  res.redirect(role === "admin" ? "/admin.html" : "/user.html");
-});
+// app.post("/login", async (req, res) => {
+//   const { username, password } = req.body;
+//
+//   const r = await db.execute({
+//     sql: "SELECT id, username, password FROM users WHERE username = ?",
+//     args: [username],
+//   });
+//   const row = r.rows[0];
+//   if (!row) return res.status(401).send("Login gagal");
+//
+//   const ok = await bcrypt.compare(password, row.password);
+//   if (!ok) return res.status(401).send("Login gagal");
+//
+//   const role = row.username === "adminbos" ? "admin" : "user";
+//   const token = jwt.sign(
+//     {
+//       username: row.username,
+//       id: row.id,
+//       role: row.username === "adminbos" ? "admin" : "user",
+//     },
+//     process.env.JWT_SECRET,
+//     { expiresIn: "8h" }, // Set expiration for the JWT
+//   );
+//
+//   res.cookie("token", token, {
+//     httpOnly: true,
+//     secure: process.env.NODE_ENV === "production",
+//     sameSite: "None",
+//   });
+//
+//   res.redirect(role === "admin" ? "/admin.html" : "/user.html");
+// });
 
 // LOGOUT
-app.post("/logout", (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).send("Failed Log Out");
-    }
-    res.clearCookie("token");
-    res.redirect("/login.html");
-  });
-});
+// app.post("/logout", (req, res) => {
+//   req.session.destroy((err) => {
+//     if (err) {
+//       return res.status(500).send("Failed Log Out");
+//     }
+//     res.clearCookie("token");
+//     res.redirect("/login.html");
+//   });
+// });
 
 // INCREMENT
 app.post("/users/:id/increment", requireLogin, async (req, res) => {
