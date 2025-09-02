@@ -53,8 +53,10 @@ const loginRoutes = require("./public/api/login");
 const registerRoutes = require("./public/api/register");
 const logoutRoutes = require("./public/api/logout");
 const addVoucherRoutes = require("./public/api/addvoucher");
+const lastBuyRoutes = require("./public/api/lastbuy");
 app.use("/users", usersRoutes);
 app.use("/users", addVoucherRoutes);
+app.use("/users", lastBuyRoutes);
 app.use("/user", userRoutes);
 app.use("/login", loginRoutes);
 app.use("/register", registerRoutes);
@@ -189,20 +191,20 @@ app.get("/login", (req, res) =>
 // });
 
 // DATE
-app.post("/users/:id/lastbuy", requireLogin, async (req, res) => {
-  const { id } = req.params;
-  const { last_buy } = req.body;
-  await db.execute({
-    sql: "UPDATE users SET last_buy = ? WHERE id = ?",
-    args: [last_buy, id],
-  });
-  const r = await db.execute({
-    sql: "SELECT id, username, total_buy, created_at, last_buy FROM users WHERE id = ?",
-    args: [id],
-  });
-  if (!r.rows[0]) return res.status(404).json({ error: "User not found" });
-  res.json(r.rows[0]);
-});
+// app.post("/users/:id/lastbuy", requireLogin, async (req, res) => {
+//   const { id } = req.params;
+//   const { last_buy } = req.body;
+//   await db.execute({
+//     sql: "UPDATE users SET last_buy = ? WHERE id = ?",
+//     args: [last_buy, id],
+//   });
+//   const r = await db.execute({
+//     sql: "SELECT id, username, total_buy, created_at, last_buy FROM users WHERE id = ?",
+//     args: [id],
+//   });
+//   if (!r.rows[0]) return res.status(404).json({ error: "User not found" });
+//   res.json(r.rows[0]);
+// });
 
 // local dev only
 if (!process.env.VERCEL) {
